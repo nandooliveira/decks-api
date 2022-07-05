@@ -1,12 +1,16 @@
-package deck
+package models
 
 import (
 	"math/rand"
+
+	"github.com/google/uuid"
 )
 
 type Deck struct {
-	Cards         []Card
-	NumberOfDecks int
+	Uuid          string `json:"uuid"`
+	Cards         []Card `json:"cards"`
+	NumberOfDecks int    `json:"number_of_decks"`
+	Shuffled      bool   `json:"shuffled"`
 }
 
 type Options struct {
@@ -17,7 +21,7 @@ type Options struct {
 	Decks    int
 }
 
-func New(options ...func(*Options)) (*Deck, error) {
+func NewDeck(options ...func(*Options)) (*Deck, error) {
 	opt := Options{Shuffled: true, Ranks: RANKS, Suits: SUITS, Decks: 1, Cards: []Card{}}
 	for _, option := range options {
 		option(&opt)
@@ -38,7 +42,7 @@ func New(options ...func(*Options)) (*Deck, error) {
 		}
 	}
 
-	deck := Deck{cards, opt.Decks}
+	deck := Deck{uuid.New().String(), cards, opt.Decks, opt.Shuffled}
 	if opt.Shuffled {
 		deck.Shuffle()
 	}
@@ -46,10 +50,14 @@ func New(options ...func(*Options)) (*Deck, error) {
 	return &deck, nil
 }
 
-func (d *Deck) Shuffle() {
-	N := len(d.Cards)
+func (this *Deck) Shuffle() {
+	N := len(this.Cards)
 	for i := 0; i < N; i++ {
 		r := i + rand.Intn(N-i)
-		d.Cards[r], d.Cards[i] = d.Cards[i], d.Cards[r]
+		this.Cards[r], this.Cards[i] = this.Cards[i], this.Cards[r]
 	}
+}
+
+func Unshuffled(o *Options) {
+	o.Shuffled = false
 }
