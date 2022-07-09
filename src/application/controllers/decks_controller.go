@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,7 +40,7 @@ type DecksController struct{}
 
 func (decksController *DecksController) Create(w http.ResponseWriter, r *http.Request) {
 	shuffled := r.URL.Query().Get("shuffled")
-
+	fmt.Println("===>>>", shuffled)
 	codeCards := r.URL.Query().Get("cards")
 
 	options := func(o *models.Options) {
