@@ -11,10 +11,6 @@ import (
 func InitRoutes() *mux.Router {
 	r := mux.NewRouter()
 
-	// home routes
-	homeController := controllers.HomeController{}
-	r.HandleFunc("/", homeController.Index).Methods("GET")
-
 	// decks routes
 	decksController := controllers.DecksController{}
 	r.HandleFunc("/decks", decksController.Create).Methods("POST")

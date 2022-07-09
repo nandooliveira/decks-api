@@ -37,7 +37,7 @@ var (
 
 type DecksController struct{}
 
-func (this *DecksController) Create(w http.ResponseWriter, r *http.Request) {
+func (decksController *DecksController) Create(w http.ResponseWriter, r *http.Request) {
 	shuffled := r.URL.Query().Get("shuffled")
 
 	codeCards := r.URL.Query().Get("cards")
@@ -67,7 +67,7 @@ func (this *DecksController) Create(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (this *DecksController) Open(w http.ResponseWriter, r *http.Request) {
+func (decksController *DecksController) Open(w http.ResponseWriter, r *http.Request) {
 	paramUUID := mux.Vars(r)["uuid"]
 
 	deck := models.FindDeck(paramUUID)
@@ -80,7 +80,7 @@ func (this *DecksController) Open(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (this *DecksController) DrawCards(w http.ResponseWriter, r *http.Request) {
+func (decksController *DecksController) DrawCards(w http.ResponseWriter, r *http.Request) {
 	paramUuid := mux.Vars(r)["uuid"]
 	paramCount := mux.Vars(r)["count"]
 	count, errParam := strconv.Atoi(paramCount)

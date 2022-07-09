@@ -10,10 +10,10 @@ type Application struct {
 	Port int32
 }
 
-func (this *Application) Init() {
+func (application *Application) Init() {
 	r := InitRoutes()
-	addr := fmt.Sprintf(":%v", this.Port)
+	addr := fmt.Sprintf(":%v", application.Port)
 
-	log.Printf("Starting server in port %v", this.Port)
+	log.Printf("Starting server in port %v", application.Port)
 	log.Fatal(http.ListenAndServe(addr, r))
 }

@@ -2,8 +2,6 @@ package models
 
 import (
 	"fmt"
-
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -48,21 +46,11 @@ type Card struct {
 }
 
 func NewCard(rank Rank, suit Suit) Card {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
 	card := Card{Rank: rank, Suit: suit, Code: fmt.Sprintf("%s%s", rank[0:1], suit[0:1])}
-	db.Create(&card)
+	DbManager.DB.Create(&card)
 	return card
 }
 
 func DeleteCard(card Card) {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	db.Delete(&card)
+	DbManager.DB.Delete(&card)
 }

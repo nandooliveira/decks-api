@@ -4,7 +4,6 @@ import (
 	"math/rand"
 
 	"github.com/google/uuid"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -45,13 +44,8 @@ func NewDeck(options ...func(*Options)) (*Deck, error) {
 		}
 	}
 
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
 	deck := Deck{Uuid: uuid.New().String(), Cards: cards, NumberOfDecks: opt.Decks, Shuffled: opt.Shuffled}
-	db.Create(&deck)
+	DbManager.DB.Create(&deck)
 
 	if opt.Shuffled {
 		deck.Shuffle()
@@ -61,13 +55,8 @@ func NewDeck(options ...func(*Options)) (*Deck, error) {
 }
 
 func FindDeck(uuid string) Deck {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
 	var deck Deck
-	db.Preload("Cards").First(&deck, "uuid = ?", uuid)
+	DbManager.DB.Preload("Cards").First(&deck, "uuid = ?", uuid)
 
 	return deck
 }
