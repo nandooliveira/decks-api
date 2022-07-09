@@ -1,6 +1,11 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
 
 type Suit string
 
@@ -35,11 +40,29 @@ var (
 )
 
 type Card struct {
-	Value Rank   `json:"rank"`
-	Suit  Suit   `json:"suit"`
-	Code  string `json:"code"`
+	gorm.Model `json:"-"`
+	Rank       Rank   `json:"value"`
+	Suit       Suit   `json:"suit"`
+	Code       string `json:"code"`
+	DeckID     uint   `json:"-"`
 }
 
 func NewCard(rank Rank, suit Suit) Card {
-	return Card{rank, suit, fmt.Sprintf("%s%s", rank[0:1], suit[0:1])}
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	card := Card{Rank: rank, Suit: suit, Code: fmt.Sprintf("%s%s", rank[0:1], suit[0:1])}
+	db.Create(&card)
+	return card
+}
+
+func DeleteCard(card Card) {
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	db.Delete(&card)
 }

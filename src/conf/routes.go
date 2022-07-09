@@ -18,8 +18,8 @@ func InitRoutes() *mux.Router {
 	// decks routes
 	decksController := controllers.DecksController{}
 	r.HandleFunc("/decks", decksController.Create).Methods("POST")
-	r.HandleFunc("/decks/{id}", decksController.Open).Methods("GET")
-	r.HandleFunc("/decks/{id}/cards", decksController.DrawCards).Methods("GET")
+	r.HandleFunc("/decks/{uuid}", decksController.Open).Methods("GET")
+	r.HandleFunc("/decks/{uuid}/{count}", decksController.DrawCards).Methods("PUT")
 
 	r.Use(logMw)
 	http.Handle("/", r)

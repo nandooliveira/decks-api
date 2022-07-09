@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/nandooliveira/deck-api/src/application/helpers"
 	"github.com/nandooliveira/deck-api/src/application/models"
@@ -70,32 +68,32 @@ func (this *DecksController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (this *DecksController) Open(w http.ResponseWriter, r *http.Request) {
-	paramId := mux.Vars(r)["id"]
-	id, errParam := strconv.ParseInt(paramId, 10, 64)
+	paramUUID := mux.Vars(r)["uuid"]
 
-	if errParam != nil {
-		handleParamError(w, "Invalid Deck ID")
-		return
-	}
+	deck := models.FindDeck(paramUUID)
 
 	helpers.RespondWithJson(w, http.StatusOK, map[string]interface{}{
-		"success": true,
-		"message": fmt.Sprintf("[%s] Open Deck: %d", uuid.New(), id),
+		"deck_id":   deck.Uuid,
+		"shuffled":  deck.Shuffled,
+		"remaining": len(deck.Cards),
+		"cards":     deck.Cards,
 	})
 }
 
 func (this *DecksController) DrawCards(w http.ResponseWriter, r *http.Request) {
-	paramId := mux.Vars(r)["id"]
-	id, errParam := strconv.ParseInt(paramId, 10, 64)
+	paramUuid := mux.Vars(r)["uuid"]
+	paramCount := mux.Vars(r)["count"]
+	count, errParam := strconv.Atoi(paramCount)
 
 	if errParam != nil {
 		handleParamError(w, "Invalid Deck ID")
 		return
 	}
 
+	cards := models.DrawCards(paramUuid, count)
+
 	helpers.RespondWithJson(w, http.StatusOK, map[string]interface{}{
-		"success": true,
-		"message": fmt.Sprintf("[%s] Draw Deck Cards: %d", uuid.New(), id),
+		"cards": cards,
 	})
 }
 

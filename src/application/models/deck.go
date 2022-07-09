@@ -4,9 +4,12 @@ import (
 	"math/rand"
 
 	"github.com/google/uuid"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type Deck struct {
+	gorm.Model
 	Uuid          string `json:"uuid"`
 	Cards         []Card `json:"cards"`
 	NumberOfDecks int    `json:"number_of_decks"`
@@ -42,7 +45,14 @@ func NewDeck(options ...func(*Options)) (*Deck, error) {
 		}
 	}
 
-	deck := Deck{uuid.New().String(), cards, opt.Decks, opt.Shuffled}
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	deck := Deck{Uuid: uuid.New().String(), Cards: cards, NumberOfDecks: opt.Decks, Shuffled: opt.Shuffled}
+	db.Create(&deck)
+
 	if opt.Shuffled {
 		deck.Shuffle()
 	}
@@ -50,11 +60,36 @@ func NewDeck(options ...func(*Options)) (*Deck, error) {
 	return &deck, nil
 }
 
-func (this *Deck) Shuffle() {
-	N := len(this.Cards)
+func FindDeck(uuid string) Deck {
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	var deck Deck
+	db.Preload("Cards").First(&deck, "uuid = ?", uuid)
+
+	return deck
+}
+
+func DrawCards(uuid string, count int) []Card {
+	deck := FindDeck(uuid)
+	cards := deck.Cards[:count]
+
+	for _, card := range cards {
+		DeleteCard(card)
+	}
+
+	deck.Cards = deck.Cards[count:]
+
+	return cards
+}
+
+func (d *Deck) Shuffle() {
+	N := len(d.Cards)
 	for i := 0; i < N; i++ {
 		r := i + rand.Intn(N-i)
-		this.Cards[r], this.Cards[i] = this.Cards[i], this.Cards[r]
+		d.Cards[r], d.Cards[i] = d.Cards[i], d.Cards[r]
 	}
 }
 
